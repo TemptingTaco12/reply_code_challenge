@@ -28,9 +28,29 @@ def matrix_from_text_file(file_path):
         tid, tc, tn = l[i].split()
         tiles.append({'ID': tid, 'Cost': int(tc), 'Number': int(tn)})
 
-    pprint.pprint(Matrix)
     return Matrix,tiles
 
 
+def little_chuncks(p1, p2, Matrix):
+    x1, y1 = p1
+    x2, y2 = p2
 
-print(matrix_from_text_file("00-trailer.txt"))
+    # Determine the top-left and bottom-right corners
+    top_left = min(y1, y2), min(x1, x2)
+    bottom_right = max(y1, y2), max(x1, x2)
+
+    # Slice the matrix
+    sub_matrix = [row[top_left[1]:bottom_right[1]+1] for row in Matrix[top_left[0]:bottom_right[0]+1]]
+
+    return sub_matrix
+
+
+def print_matrix(matrix):
+    for row in matrix:
+        print(row)
+
+Matrix, tiles = matrix_from_text_file('00-trailer.txt')
+chunk1 = little_chuncks((2,4), (6,6), Matrix)
+
+print_matrix(Matrix)
+print_matrix(chunk1)
