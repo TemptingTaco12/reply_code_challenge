@@ -108,3 +108,5 @@ end_point = (0, 1)
 all_traversals = find_traversals(matrix, start_point, end_point)
 for i, traversal in enumerate(all_traversals):
     print(f"Traversal {i + 1}: {traversal}")
+
+
