@@ -14,21 +14,26 @@ def matrix_from_text_file(file_path):
     l1 = l[0].split()
     W,H,Gn,Sm,Tl = int(l1[0]),int(l1[1]),int(l1[2]),int(l1[3]),int(l1[4])
     Matrix = [[0]*W for _ in range(H)]
+    golden_point = []
+    silver_point = []
+    tiles = []
     
     for i in range(1, Gn+1): # Golden Point position
         gx, gy = map(int, l[i].split())
         Matrix[gy][gx] = 1
+        golden_point.append({'x': gx, 'y': gy})
+
     
     for i in range(Gn+1, Gn+Sm+1): # Silver point position
         sx, sy, ssc = map(int, l[i].split())
         Matrix[sy][sx] = (2, ssc)
+        silver_point.append({'x': sx, 'y': sy, 'ssc': ssc})
 
-    tiles = []
     for i in range(Gn+Sm+1, Gn+Sm+Tl+1): #dict of tiles with ID, Cost, Number
         tid, tc, tn = l[i].split()
         tiles.append({'ID': tid, 'Cost': int(tc), 'Number': int(tn)})
 
-    return Matrix,tiles
+    return Matrix,golden_point,silver_point,tiles
 
 # print(matrix_from_text_file("00-trailer.txt"))
 
@@ -55,6 +60,7 @@ chunk1 = little_chuncks((2,4), (6,6), Matrix)
 
 print_matrix(Matrix)
 print_matrix(chunk1)
+
 def is_valid_move(matrix, visited, x, y):
     # Check if the move is within the bounds of the matrix and the cell is not visited
     return 0 <= x < len(matrix) and 0 <= y < len(matrix[0]) and not visited[x][y]
