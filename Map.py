@@ -20,17 +20,19 @@ def matrix_from_text_file(file_path):
     for i in range(1, Gn+1): # Golden Point position
         gx, gy = map(int, l[i].split())
         Matrix[gy][gx] = 1
+        golden_point.append((gx, gy))
     
     for i in range(Gn+1, Gn+Sm+1): # Silver point position
         sx, sy, ssc = map(int, l[i].split())
         Matrix[sy][sx] = (2, ssc)
+        silver_point.append((sx, sy, ssc))
 
     tiles = []
     for i in range(Gn+Sm+1, Gn+Sm+Tl+1): #dict of tiles with ID, Cost, Number
         tid, tc, tn = l[i].split()
         tiles.append({'ID': tid, 'Cost': int(tc), 'Number': int(tn)})
 
-    return Matrix,tiles
+    return Matrix,tiles, golden_point, silver_point
 
 # print(matrix_from_text_file("00-trailer.txt"))
 
