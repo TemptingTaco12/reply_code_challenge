@@ -1,6 +1,5 @@
 import pprint
-
-
+from collections import deque
 
 def read_text_file_line_by_line(file_path):
     l = []
@@ -14,26 +13,21 @@ def matrix_from_text_file(file_path):
     l1 = l[0].split()
     W,H,Gn,Sm,Tl = int(l1[0]),int(l1[1]),int(l1[2]),int(l1[3]),int(l1[4])
     Matrix = [[0]*W for _ in range(H)]
-    golden_point = []
-    silver_point = []
-    tiles = []
     
     for i in range(1, Gn+1): # Golden Point position
         gx, gy = map(int, l[i].split())
         Matrix[gy][gx] = 1
-        golden_point.append({'x': gx, 'y': gy})
-
     
     for i in range(Gn+1, Gn+Sm+1): # Silver point position
         sx, sy, ssc = map(int, l[i].split())
         Matrix[sy][sx] = (2, ssc)
-        silver_point.append({'x': sx, 'y': sy, 'ssc': ssc})
 
+    tiles = []
     for i in range(Gn+Sm+1, Gn+Sm+Tl+1): #dict of tiles with ID, Cost, Number
         tid, tc, tn = l[i].split()
         tiles.append({'ID': tid, 'Cost': int(tc), 'Number': int(tn)})
 
-    return Matrix,golden_point,silver_point,tiles
+    return Matrix,tiles
 
 # print(matrix_from_text_file("00-trailer.txt"))
 
@@ -108,3 +102,46 @@ end_point = (0, 1)
 all_traversals = find_traversals(matrix, start_point, end_point)
 for i, traversal in enumerate(all_traversals):
     print(f"Traversal {i + 1}: {traversal}")
+
+def is_valid_move(matrix, visited, x, y):
+    # Check if the move is within the bounds of the matrix and the cell is not visited
+    return 0 <= x < len(matrix) and 0 <= y < len(matrix[0]) and not visited[x][y]
+
+def bfs(matrix, start, target_points):
+    rows, cols = len(matrix), len(matrix[0])
+    visited = [[False] * cols for _ in range(rows)]
+    queue = deque([(start, 0)])  # Store the point and its distance from the start
+    
+    while queue:
+        (x, y), distance = queue.popleft()
+        visited[x][y] = True
+        
+        # Check if the current cell contains any of the target points
+        if (x, y) in target_points:
+            return (x, y), distance
+        
+        # Explore adjacent cells
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # right, left, down, up
+        for dx, dy in directions:
+            new_x, new_y = x + dx, y + dy
+            if is_valid_move(matrix, visited, new_x, new_y):
+                queue.append(((new_x, new_y), distance + 1))
+    
+    # If no target point is found, return None
+    return None, float('inf')
+
+def nearest_point(matrix, start, target_points):
+    nearest, distance = bfs(matrix, start, target_points)
+    return nearest
+
+# Example usage:
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+starting_point = (0, 0)
+points_list = [(2, 2), (1, 1), (0, 2)]
+
+nearest = nearest_point(matrix, starting_point, points_list)
+print("Nearest point:", nearest)
