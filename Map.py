@@ -27,6 +27,52 @@ def matrix_from_text_file(file_path):
 
     return Matrix,tiles
 
+# print(matrix_from_text_file("01-comedy.txt"))
 
+def is_valid_move(matrix, visited, x, y):
+    # Check if the move is within the bounds of the matrix and the cell is not visited
+    return 0 <= x < len(matrix) and 0 <= y < len(matrix[0]) and not visited[x][y]
 
-print(matrix_from_text_file("01-comedy.txt"))
+def dfs(matrix, visited, x, y, dest_x, dest_y, path, paths):
+    # Mark the current cell as visited and add it to the current path
+    visited[x][y] = True
+    path.append((x, y))
+    
+    # If the destination is reached, add the current path to the list of paths
+    if x == dest_x and y == dest_y:
+        paths.append(path[:])
+    else:
+        # Explore all valid adjacent cells
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # right, left, down, up
+        for dx, dy in directions:
+            new_x, new_y = x + dx, y + dy
+            if is_valid_move(matrix, visited, new_x, new_y):
+                dfs(matrix, visited, new_x, new_y, dest_x, dest_y, path, paths)
+    
+    # Backtrack: mark the current cell as unvisited and remove it from the current path
+    visited[x][y] = False
+    path.pop()
+
+def find_traversals(matrix, start, end):
+    traversals = []
+    rows, cols = len(matrix), len(matrix[0])
+    start_x, start_y = start
+    end_x, end_y = end
+    
+    visited = [[False] * cols for _ in range(rows)]
+    path = []
+    dfs(matrix, visited, start_x, start_y, end_x, end_y, path, traversals)
+    return traversals
+
+# Example usage:
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+start_point = (0, 0)
+end_point = (0, 1)
+
+all_traversals = find_traversals(matrix, start_point, end_point)
+for i, traversal in enumerate(all_traversals):
+    print(f"Traversal {i + 1}: {traversal}")
